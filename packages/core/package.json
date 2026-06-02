@@ -1,0 +1,42 @@
+{
+  "name": "@md2wechat/core",
+  "version": "0.1.0",
+  "description": "Core rendering engine for md2wechat - markdown to WeChat-compatible HTML",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./themes": {
+      "types": "./dist/theme/presets/index.d.ts",
+      "default": "./dist/theme/presets/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "markdown-it": "^14.1.0",
+    "shiki": "^3.0.0",
+    "katex": "^0.16.21"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/markdown-it": "^14.1.0",
+    "@types/katex": "^0.16.7"
+  },
+  "peerDependencies": {
+    "mermaid": "^11.4.0"
+  },
+  "peerDependenciesMeta": {
+    "mermaid": {
+      "optional": true
+    }
+  }
+}

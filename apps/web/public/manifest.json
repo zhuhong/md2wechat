@@ -1,0 +1,12 @@
+{
+  "name": "md2wechat - Markdown to WeChat Editor",
+  "short_name": "md2wechat",
+  "description": "将 Markdown 一键转换为微信公众号兼容 HTML",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#18181b",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

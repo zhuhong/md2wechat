@@ -1,0 +1,17 @@
+{
+  "name": "md2wechat",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Markdown editor optimized for WeChat article publishing",
+  "scripts": {
+    "dev": "pnpm --filter @md2wechat/web dev",
+    "build": "pnpm -r build",
+    "lint": "eslint . --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
