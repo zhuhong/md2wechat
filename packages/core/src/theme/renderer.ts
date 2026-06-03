@@ -112,6 +112,8 @@ function renderTextStyle(t: TextStyle): string {
     color: t.color,
     lineHeight: t.lineHeight,
     letterSpacing: t.letterSpacing,
+    marginTop: t.marginTop,
+    marginBottom: t.marginBottom,
   });
 }
 

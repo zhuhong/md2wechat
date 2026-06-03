@@ -4,12 +4,14 @@ import { Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default function DownloadButton() {
-  const { content, filename } = useEditorStore()
-  const { html, loading } = useMarkdownParser(content)
+  const { content, filename, renderTheme, renderedPreviewHtml } = useEditorStore()
+  const { html, loading } = useMarkdownParser(content, renderTheme)
+
+  const finalHtml = renderedPreviewHtml || html
 
   const handleDownload = () => {
-    if (loading || !html) return
-    const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${filename}</title></head><body style="max-width:677px;margin:0 auto;padding:1em;">${html}</body></html>`
+    if (loading || !finalHtml) return
+    const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${filename}</title></head><body style="max-width:677px;margin:0 auto;padding:1em;">${finalHtml}</body></html>`
     const blob = new Blob([fullHtml], { type: 'text/html' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')

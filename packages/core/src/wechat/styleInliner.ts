@@ -45,6 +45,11 @@ export function inlineStyles(doc: Document, theme?: Theme): void {
     ) {
       return;
     }
+    // Preserve KaTeX classes so the preview stays correct.
+    // Note: WeChat editor may still strip these classes on paste.
+    if (el.closest('.katex') || el.classList.contains('katex')) {
+      return;
+    }
     el.removeAttribute('class');
   });
 

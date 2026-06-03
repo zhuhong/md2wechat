@@ -1,4 +1,4 @@
-import { createHighlighter, type Highlighter } from 'shiki';
+import type { Highlighter } from 'shiki';
 import type { Diagnostic, ParserOptions } from '../types.js';
 
 let highlighter: Highlighter | null = null;
@@ -24,13 +24,15 @@ async function getHighlighter(options?: ParserOptions): Promise<Highlighter | nu
   if (highlighter) return highlighter;
   if (initPromise) return initPromise;
 
-  initPromise = createHighlighter({
-    themes: [options?.shikiTheme ?? 'github-light'],
-    langs: options?.shikiLanguages ?? DEFAULT_LANGUAGES,
-  }).then((h) => {
+  initPromise = (async () => {
+    const { createHighlighter } = await import('shiki');
+    const h = await createHighlighter({
+      themes: [options?.shikiTheme ?? 'github-light'],
+      langs: options?.shikiLanguages ?? DEFAULT_LANGUAGES,
+    });
     highlighter = h;
     return h;
-  });
+  })();
 
   return initPromise;
 }

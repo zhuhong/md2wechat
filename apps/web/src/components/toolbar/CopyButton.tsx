@@ -5,13 +5,15 @@ import { Copy, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default function CopyButton() {
-  const { content } = useEditorStore()
+  const { content, renderTheme, renderedPreviewHtml } = useEditorStore()
   const { copied, copyHTML } = useClipboard()
-  const { html, loading } = useMarkdownParser(content)
+  const { html, loading } = useMarkdownParser(content, renderTheme)
+
+  const finalHtml = renderedPreviewHtml || html
 
   const handleCopy = async () => {
-    if (loading || !html) return
-    await copyHTML(html)
+    if (loading || !finalHtml) return
+    await copyHTML(finalHtml)
   }
 
   return (

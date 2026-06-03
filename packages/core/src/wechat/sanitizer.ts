@@ -11,7 +11,7 @@ const ALLOWED_TAGS = new Set([
 
 const ALLOWED_ATTRS = new Set([
   'href', 'src', 'alt', 'title', 'style', 'id', 'class',
-  'data-original-src', 'data-diagram', 'lang', 'xmlns',
+  'data-original-src', 'data-diagram', 'data-diagram-type', 'lang', 'xmlns',
 ]);
 
 export function sanitizeForWechat(doc: Document): Diagnostic[] {

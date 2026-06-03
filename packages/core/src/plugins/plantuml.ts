@@ -15,7 +15,7 @@ export function plantumlPlugin(md: MarkdownIt): void {
 
     const content = token.content.trim();
     // Produce a placeholder; preview component will render it
-    return `<div class="plantuml" data-diagram="${encodeHtml(content)}">${escapeHtml(content)}</div>`;
+    return `<div data-diagram-type="plantuml" data-diagram="${encodeHtml(content)}">${escapeHtml(content)}</div>`;
   };
 }
 

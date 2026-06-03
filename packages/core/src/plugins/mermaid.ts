@@ -15,7 +15,7 @@ export function mermaidPlugin(md: MarkdownIt): void {
 
     const content = token.content.trim();
     // Produce a placeholder; post-processor will replace with rendered SVG
-    return `<div class="mermaid" data-diagram="${encodeHtml(content)}">${escapeHtml(content)}</div>`;
+    return `<div data-diagram-type="mermaid" data-diagram="${encodeHtml(content)}">${escapeHtml(content)}</div>`;
   };
 }
 

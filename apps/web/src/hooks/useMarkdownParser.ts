@@ -1,7 +1,31 @@
-import { useState, useEffect } from 'react'
-import { renderToWechatHTML } from '@md2wechat/core'
+import { useState, useEffect, useMemo } from 'react'
+import {
+  renderToWechatHTML,
+  mergeThemePresetWithOverrides,
+  defaultTheme,
+  minimalTheme,
+  techTheme,
+  elegantTheme,
+} from '@md2wechat/core'
+import type { Theme } from '@md2wechat/core'
+import { useCustomThemeStore } from '@/stores/customThemeStore'
+
+function getPresetTheme(themeId?: string): Theme {
+  if (!themeId || themeId === 'default') return defaultTheme
+  if (themeId === 'minimal') return minimalTheme
+  if (themeId === 'tech') return techTheme
+  if (themeId === 'elegant') return elegantTheme
+  return defaultTheme
+}
 
 export function useMarkdownParser(markdown: string, theme?: string) {
+  const overrides = useCustomThemeStore((s) => s.overrides)
+
+  const mergedTheme = useMemo(() => {
+    const base = getPresetTheme(theme)
+    return mergeThemePresetWithOverrides(base, overrides)
+  }, [theme, overrides])
+
   const [html, setHtml] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -11,7 +35,7 @@ export function useMarkdownParser(markdown: string, theme?: string) {
     setLoading(true)
     setError(null)
 
-    renderToWechatHTML(markdown, { theme })
+    renderToWechatHTML(markdown, { theme: mergedTheme })
       .then((result) => {
         if (!cancelled) {
           setHtml(result)
@@ -30,7 +54,7 @@ export function useMarkdownParser(markdown: string, theme?: string) {
     return () => {
       cancelled = true
     }
-  }, [markdown, theme])
+  }, [markdown, mergedTheme])
 
   return { html, loading, error }
 }

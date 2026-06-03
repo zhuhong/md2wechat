@@ -61,6 +61,8 @@ export interface TextStyle {
   color?: string;
   lineHeight?: number;
   letterSpacing?: string;
+  marginTop?: string;
+  marginBottom?: string;
 }
 
 export interface HeadingStyle extends TextStyle {

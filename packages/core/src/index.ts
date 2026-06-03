@@ -13,6 +13,8 @@ import { inlineStyles } from './wechat/styleInliner.js';
 import { processImages } from './wechat/imageProcessor.js';
 import { sanitizeForWechat } from './wechat/sanitizer.js';
 import { processCodeBlocks } from './wechat/codeBlockProcessor.js';
+import type { ThemeOverrides } from './theme/merge.js';
+import { mergeThemePresetWithOverrides } from './theme/merge.js';
 
 export type {
   RenderOptions,
@@ -23,8 +25,10 @@ export type {
   Diagnostic,
 };
 export type { Theme } from './theme/types.js';
+export type { ThemeOverrides } from './theme/merge.js';
 export { defaultTheme, minimalTheme, techTheme, elegantTheme } from './theme/presets/index.js';
 export { createParser } from './parser.js';
+export { mergeThemePresetWithOverrides } from './theme/merge.js';
 
 const DEFAULT_PARSER_OPTIONS: ParserOptions = {
   enableKatex: true,
@@ -44,7 +48,9 @@ const DEFAULT_WECHAT_OPTIONS: WechatOptions = {
   inlineStyles: true,
 };
 
-function getThemeById(themeId?: string): Theme {
+function resolveTheme(themeOrId?: string | Theme): Theme {
+  if (typeof themeOrId === 'object' && themeOrId !== null) return themeOrId;
+  const themeId = themeOrId as string | undefined;
   if (!themeId || themeId === 'default') return defaultTheme;
   if (themeId === 'minimal') return minimalTheme;
   if (themeId === 'tech') return techTheme;
@@ -58,7 +64,7 @@ function getThemeById(themeId?: string): Theme {
  */
 export async function renderToWechatHTML(
   markdown: string,
-  options?: { theme?: string; parser?: ParserOptions; wechat?: WechatOptions }
+  options?: { theme?: string | Theme; parser?: ParserOptions; wechat?: WechatOptions }
 ): Promise<string> {
   const result = await renderMarkdown(markdown, options);
   return result.previewHtml;
@@ -69,9 +75,9 @@ export async function renderToWechatHTML(
  */
 export async function renderMarkdown(
   markdown: string,
-  options?: { theme?: string; parser?: ParserOptions; wechat?: WechatOptions }
+  options?: { theme?: string | Theme; parser?: ParserOptions; wechat?: WechatOptions }
 ): Promise<RenderResult> {
-  const theme = getThemeById(options?.theme);
+  const theme = resolveTheme(options?.theme);
   const parserOpts = { ...DEFAULT_PARSER_OPTIONS, ...options?.parser };
   const wechatOpts = { ...DEFAULT_WECHAT_OPTIONS, ...options?.wechat };
 

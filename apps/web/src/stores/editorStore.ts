@@ -12,6 +12,8 @@ interface EditorState {
   setDirty: (dirty: boolean) => void
   renderTheme: RenderTheme
   setRenderTheme: (theme: RenderTheme) => void
+  renderedPreviewHtml: string
+  setRenderedPreviewHtml: (html: string) => void
   isLoaded: boolean
   loadDraft: () => Promise<void>
 }
@@ -63,7 +65,7 @@ function greet(name: string): string {
 |------|------|------|
 | 基础渲染 | ✅ | headings, lists, code |
 | 代码高亮 | ✅ | Shiki 驱动 |
-| 数学公式 | ✅ | KaTeX |
+| 数学公式 | ⚠️ | KaTeX 预览可用，公众号粘贴样式可能不完整 |
 | 图表 | 🔄 | Mermaid 支持中 |
 
 ---
@@ -95,6 +97,8 @@ export const useEditorStore = create<EditorState>()((set, get) => ({
   setDirty: (isDirty) => set({ isDirty }),
   renderTheme: 'default',
   setRenderTheme: (renderTheme) => set({ renderTheme }),
+  renderedPreviewHtml: '',
+  setRenderedPreviewHtml: (renderedPreviewHtml) => set({ renderedPreviewHtml }),
   isLoaded: false,
   loadDraft: async () => {
     try {

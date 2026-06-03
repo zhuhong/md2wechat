@@ -1,15 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-
-interface ThemeOverrides {
-  fontSize?: number
-  lineHeight?: number
-  primaryTextColor?: string
-  linkColor?: string
-  codeColor?: string
-  paragraphMargin?: number
-  headingMargin?: number
-}
+import type { ThemeOverrides } from '@md2wechat/core'
 
 interface CustomThemeState {
   panelOpen: boolean
