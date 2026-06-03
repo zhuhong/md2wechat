@@ -29,3 +29,6 @@ pnpm-debug.log*
 
 # Testing
 coverage
+
+# Project planning docs
+plans/
