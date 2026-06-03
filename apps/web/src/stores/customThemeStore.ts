@@ -14,6 +14,7 @@ interface CustomThemeState {
   setParagraphMargin: (value: number) => void
   setHeadingMargin: (value: number) => void
   reset: () => void
+  resetFontSize: () => void
 }
 
 export const useCustomThemeStore = create<CustomThemeState>()(
@@ -51,6 +52,12 @@ export const useCustomThemeStore = create<CustomThemeState>()(
           overrides: { ...state.overrides, headingMargin: value },
         })),
       reset: () => set({ overrides: {} }),
+      resetFontSize: () =>
+        set((state) => {
+          const next = { ...state.overrides }
+          delete (next as Record<string, unknown>).fontSize
+          return { overrides: next }
+        }),
     }),
     {
       name: 'md2wechat-custom-theme',

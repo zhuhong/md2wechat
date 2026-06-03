@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { useEditorStore } from '@/stores/editorStore'
+import { useCustomThemeStore } from '@/stores/customThemeStore'
 import { useMarkdownParser } from '@/hooks/useMarkdownParser'
+import { ZoomOut, ZoomIn, RotateCcw } from 'lucide-react'
 
 function escapeHtml(text: string): string {
   return text
@@ -11,10 +13,28 @@ function escapeHtml(text: string): string {
     .replace(/'/g, '&#39;')
 }
 
+const FONT_MIN = 10
+const FONT_MAX = 30
+const FONT_STEP = 2
+
 export default function WechatPreview() {
   const { content, renderTheme, setRenderedPreviewHtml } = useEditorStore()
   const { html, loading } = useMarkdownParser(content, renderTheme)
   const articleRef = useRef<HTMLElement>(null)
+
+  const overrides = useCustomThemeStore((s) => s.overrides)
+  const setFontSize = useCustomThemeStore((s) => s.setFontSize)
+  const resetFontSize = useCustomThemeStore((s) => s.resetFontSize)
+
+  const currentFontSize = overrides.fontSize ?? 16
+
+  const decreaseFont = () => {
+    setFontSize(Math.max(FONT_MIN, currentFontSize - FONT_STEP))
+  }
+
+  const increaseFont = () => {
+    setFontSize(Math.min(FONT_MAX, currentFontSize + FONT_STEP))
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -84,8 +104,40 @@ export default function WechatPreview() {
       className="bg-white shadow-sm border rounded-sm overflow-hidden"
       style={{ width: 375, minHeight: 600 }}
     >
-      <div className="bg-muted text-xs text-muted-foreground px-3 py-1.5 text-center border-b">
-        微信公众号文章预览 · 375px
+      <div className="bg-muted text-xs text-muted-foreground px-3 py-1.5 border-b flex items-center justify-between relative">
+        <div className="flex items-center gap-1">
+          <button
+            onClick={decreaseFont}
+            disabled={currentFontSize <= FONT_MIN}
+            className="p-0.5 rounded hover:bg-accent disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            title="缩小字体"
+          >
+            <ZoomOut className="w-3 h-3" />
+          </button>
+          <span className="font-mono text-[11px] w-8 text-center">
+            {currentFontSize}px
+          </span>
+          <button
+            onClick={increaseFont}
+            disabled={currentFontSize >= FONT_MAX}
+            className="p-0.5 rounded hover:bg-accent disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            title="放大字体"
+          >
+            <ZoomIn className="w-3 h-3" />
+          </button>
+          {overrides.fontSize && (
+            <button
+              onClick={resetFontSize}
+              className="p-0.5 rounded hover:bg-accent transition-colors ml-0.5"
+              title="重置字体"
+            >
+              <RotateCcw className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+        <span className="absolute left-1/2 -translate-x-1/2">
+          微信公众号文章预览 · 375px
+        </span>
       </div>
       {loading && (
         <div className="p-8 text-center text-muted-foreground text-sm">
