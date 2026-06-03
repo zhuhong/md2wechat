@@ -82,8 +82,9 @@ export function renderTagStyle(theme: Theme, tag: string): string {
     case 'hr':
       return renderHRStyle(theme.hr);
     case 'ul':
+      return renderListStyle(theme.list, 'ul');
     case 'ol':
-      return renderListStyle(theme.list);
+      return renderListStyle(theme.list, 'ol');
     case 'li':
       return styleToString({ margin: theme.list.itemMargin });
     default:
@@ -214,10 +215,11 @@ function renderHRStyle(h: HRStyle): string {
   });
 }
 
-function renderListStyle(l: ListStyle): string {
+function renderListStyle(l: ListStyle, tag: 'ul' | 'ol'): string {
   return styleToString({
     margin: l.margin,
     paddingLeft: l.paddingLeft,
+    listStyleType: tag === 'ul' ? 'disc' : 'decimal',
   });
 }
 

@@ -90,12 +90,7 @@ export async function renderMarkdown(
   const parser = new DOMParser();
   const doc = parser.parseFromString(fullHtml, 'text/html');
 
-  // Theme styles
-  if (wechatOpts.inlineStyles) {
-    inlineStyles(doc, theme);
-  }
-
-  // Code blocks (Shiki highlighting)
+  // Code blocks (Shiki highlighting) – before inlineStyles so themes are applied to Shiki output too
   const { diagnostics: codeDiagnostics } = await processCodeBlocks(doc, parserOpts);
 
   // Images
@@ -103,6 +98,11 @@ export async function renderMarkdown(
 
   // Sanitize (remove unsupported tags/attrs)
   const sanitizeDiagnostics = sanitizeForWechat(doc);
+
+  // Theme inline styles + class cleanup (run last so all generated elements get styled)
+  if (wechatOpts.inlineStyles) {
+    inlineStyles(doc, theme);
+  }
 
   // Build results
   const bodyHtml = doc.body?.innerHTML ?? '';

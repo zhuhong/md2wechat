@@ -50,6 +50,10 @@ export function inlineStyles(doc: Document, theme?: Theme): void {
     if (el.closest('.katex') || el.classList.contains('katex')) {
       return;
     }
+    // Preserve Shiki syntax-highlighting classes.
+    if (el.closest('.shiki') || el.classList.contains('shiki')) {
+      return;
+    }
     el.removeAttribute('class');
   });
 
