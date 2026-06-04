@@ -144,7 +144,9 @@ async function fetchFeishuApi<T>(url: URL, accessToken: string): Promise<T> {
 }
 
 function normalizeMarkdown(markdown: string): string {
-  return convertHtmlTablesToMarkdown(markdown)
+  // Decode HTML entities (e.g. &#34; -> ") across the whole document.
+  // Feishu API often returns quoted/escaped entities in its markdown export.
+  return decodeHtmlEntities(convertHtmlTablesToMarkdown(markdown))
     .replace(/\r\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
