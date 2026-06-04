@@ -72,9 +72,9 @@ export function renderTagStyle(theme: Theme, tag: string): string {
     case 'table':
       return renderTableStyle(theme.table);
     case 'th':
-      return renderTableThStyle(theme.table);
+      return renderTableThStyle(theme.table, theme.paragraph);
     case 'td':
-      return renderTableTdStyle(theme.table);
+      return renderTableTdStyle(theme.table, theme.paragraph);
     case 'a':
       return renderLinkStyle(theme.link);
     case 'img':
@@ -170,22 +170,29 @@ function renderTableStyle(t: TableStyle): string {
   });
 }
 
-function renderTableThStyle(t: TableStyle): string {
+function renderTableThStyle(t: TableStyle, text: TextStyle): string {
   return styleToString({
     border: t.thBorder ?? t.border,
     padding: t.thPadding,
     backgroundColor: t.thBackgroundColor,
-    color: t.thColor,
+    color: t.thColor ?? text.color,
+    fontSize: text.fontSize,
+    lineHeight: text.lineHeight,
+    letterSpacing: text.letterSpacing,
     fontWeight: 600,
     textAlign: 'left',
   });
 }
 
-function renderTableTdStyle(t: TableStyle): string {
+function renderTableTdStyle(t: TableStyle, text: TextStyle): string {
   return styleToString({
     border: t.tdBorder ?? t.border,
     padding: t.tdPadding,
     backgroundColor: t.tdBackgroundColor,
+    color: text.color,
+    fontSize: text.fontSize,
+    lineHeight: text.lineHeight,
+    letterSpacing: text.letterSpacing,
   });
 }
 
