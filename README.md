@@ -2,6 +2,9 @@
 
 > Markdown 编辑器，一键生成微信公众号兼容的排版 HTML。
 
+[![GitHub Pages部署状态](https://img.shields.io/github/deployments/zhuhong/md2wechat/github-pages?label=部署&style=flat-square)](https://zhuhong.github.io/md2wechat/)
+[![在线体验](https://img.shields.io/badge/在线体验-zhuhong.github.io/md2wechat-blue?style=flat-square&logo=github)](https://zhuhong.github.io/md2wechat/)
+
 **md2wechat** 是一个专为微信公众号文章排版设计的 Markdown 编辑工具。左侧编写 Markdown，右侧实时预览微信排版效果，支持代码高亮、数学公式、Mermaid 图表等丰富语法，导出 HTML 可直接粘贴到公众号编辑器。
 
 ## ✨ 功能特性
