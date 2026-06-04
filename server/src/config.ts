@@ -1,6 +1,13 @@
 import dotenv from 'dotenv';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-dotenv.config();
+const currentDir = dirname(fileURLToPath(import.meta.url));
+const workspaceRoot = resolve(currentDir, '../..');
+const serverRoot = resolve(currentDir, '..');
+
+dotenv.config({ path: resolve(workspaceRoot, '.env') });
+dotenv.config({ path: resolve(serverRoot, '.env'), override: true });
 
 export const config = {
   port: Number(process.env.PORT ?? 3000),

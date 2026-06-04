@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import type { ApiResponse, ResolveRequest, ResolveResponse } from '../types/index.js';
+import { resolveFeishuDocument } from '../services/feishuService.js';
 
 const connectors = new Hono();
 
@@ -29,13 +30,18 @@ connectors.post('/resolve', async (c) => {
   let mockResponse: ResolveResponse;
 
   if (body.source === 'feishu') {
-    mockResponse = {
-      source: 'feishu',
-      title: 'Mock Feishu Document',
-      markdown: `# Mock Feishu Document\n\nSource: ${body.source}\nInput: ${body.input}\nToken provided: ${body.token ? 'yes' : 'no'}`,
-      assets: [],
-      warnings: ['当前为 mock 实现，尚未接入真实 Feishu API。'],
-    };
+    try {
+      mockResponse = await resolveFeishuDocument(body.input, body.token);
+    } catch (err) {
+      console.error('[FeishuConnector]', err);
+      const response: ApiResponse<never> = {
+        success: false,
+        error: err instanceof Error ? err.message : 'Feishu document resolve failed',
+        code: 'FEISHU_RESOLVE_ERROR',
+      };
+      c.status(502);
+      return c.json(response);
+    }
   } else if (body.source === 'notion') {
     mockResponse = {
       source: 'notion',

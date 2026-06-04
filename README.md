@@ -15,7 +15,8 @@
 - 📊 **图表支持**：Mermaid 流程图 + PlantUML
 - 📋 **一键导出**：复制 HTML / 下载 HTML 文件
 - 💾 **草稿自动保存**：IndexedDB 自动保存，刷新不丢失
-- 📥 **外部导入**：支持飞书/Notion 文档导入（建设中）
+- 📥 **外部导入**：支持飞书文档导入，Notion 入口暂为 mock
+- 🧾 **飞书表格兼容**：自动将飞书返回的 HTML 表格转换为 Markdown 表格
 - 📱 **PWA**：支持离线使用
 
 ## 🚀 快速开始
@@ -38,6 +39,26 @@ pnpm dev
 ```
 
 打开 http://localhost:5173 即可使用。
+
+`pnpm dev` 会同时启动：
+
+| 服务 | 地址 | 说明 |
+|------|------|------|
+| Web | http://localhost:5173 | React + Vite 前端 |
+| Server | http://localhost:3000 | Hono API 服务 |
+
+也可以分别启动：
+
+```bash
+pnpm dev:web
+pnpm dev:server
+```
+
+前端开发服务器会把 `/api` 请求代理到 `http://localhost:3000`。如需修改代理目标，可设置：
+
+```bash
+VITE_API_PROXY_TARGET=http://localhost:3000 pnpm dev:web
+```
 
 ### 构建
 
@@ -75,6 +96,47 @@ md2wechat/
 | `@md2wechat/core` | `packages/core` | markdown-it 插件、主题系统、微信后处理管线 |
 | `@md2wechat/connectors` | `packages/connectors` | 飞书/Notion URL 解析与 API 客户端 |
 | `server` | `server` | Hono HTTP 服务，代理外部平台 API |
+
+## 📥 外部文档导入
+
+### 飞书文档导入
+
+飞书导入通过后端服务调用飞书开放平台 API。前端只负责提交文档 URL，实际鉴权和文档内容拉取在 `server` 内完成。
+
+支持的 URL 形式：
+
+```text
+https://xxx.feishu.cn/docx/...
+https://xxx.feishu.cn/docs/...
+https://xxx.feishu.cn/wiki/...
+```
+
+配置环境变量，根目录 `.env` 和 `server/.env` 均可：
+
+```bash
+FEISHU_APP_ID=cli_xxx
+FEISHU_APP_SECRET=xxx
+```
+
+`server/.env` 的值会覆盖根目录 `.env`。服务端默认读取 `PORT=3000`，前端默认将 `/api` 代理到该端口。
+
+飞书应用需要开通以下应用身份权限：
+
+```text
+docs:document.content:read
+```
+
+导入失败时，前端会展示飞书错误码、缺失权限、开通权限链接和原始错误。常见错误：
+
+| 错误码 | 含义 | 处理方式 |
+|--------|------|----------|
+| `99991672` | 飞书应用缺少接口权限 | 在飞书开放平台为当前应用开通 `docs:document.content:read`，发布或生效应用后重试 |
+
+飞书接口在 `content_type=markdown` 时仍可能返回 HTML 表格。服务端会在导入阶段将 `<table>` 转换为标准 Markdown 表格，再交给核心渲染器处理。
+
+### Notion 导入
+
+Notion 入口已保留，但当前仍是 mock 实现，尚未接入真实 Notion API。
 
 ## 🛠 技术栈
 
@@ -134,9 +196,11 @@ Markdown 输入
 
 ### 添加外部导入源
 
-1. 在 `packages/connectors` 中实现 `BaseConnector` 接口
-2. 在 `server/src/connectors/` 中添加对应的 API 路由
-3. 在前端 `ImportDialog` 中注册新的导入选项
+1. 在 `packages/connectors/src` 中实现 `DocumentConnector` 接口
+2. 在 `server/src/routes/connectors.ts` 中接入对应 source
+3. 如需调用第三方 API，在 `server/src/services/` 中新增服务
+4. 在前端 `apps/web/src/components/import/ImportDialog.tsx` 中注册新的导入选项
+5. 在 `apps/web/src/hooks/useConnector.ts` 中补充调用和错误展示逻辑
 
 ## 📄 License
 

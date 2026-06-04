@@ -11,10 +11,27 @@ async function parseResponse<T>(response: Response): Promise<T> {
   return json.data;
 }
 
+async function readErrorMessage(response: Response): Promise<string> {
+  const text = await response.text().catch(() => '');
+  if (!text) {
+    return response.statusText || `HTTP ${response.status}`;
+  }
+
+  try {
+    const json = JSON.parse(text) as { error?: string; code?: string };
+    if (json.error) return json.error;
+    if (json.code) return `Request failed: ${json.code}`;
+  } catch {
+    return text;
+  }
+
+  return response.statusText || `HTTP ${response.status}`;
+}
+
 export class FeishuConnector implements DocumentConnector {
   readonly source = 'feishu' as const;
 
-  private readonly urlPattern = /https?:\/\/\w+\.feishu\.cn\/(?:docs|docx|wiki)\/([a-zA-Z0-9]+)/;
+  private readonly urlPattern = /https?:\/\/[^/]+\.feishu\.cn\/(?:docs|docx|wiki)\/([a-zA-Z0-9]+)/;
 
   validateInput(input: string): { valid: boolean; error?: string } {
     if (!this.urlPattern.test(input)) {
@@ -42,7 +59,8 @@ export class FeishuConnector implements DocumentConnector {
     });
 
     if (!response.ok) {
-      throw new Error(`飞书文档解析失败: ${response.statusText}`);
+      const message = await readErrorMessage(response);
+      throw new Error(`飞书文档解析失败: ${message}`);
     }
 
     return parseResponse<ResolvedDocument>(response);

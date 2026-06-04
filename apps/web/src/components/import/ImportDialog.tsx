@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useConnector } from '@/hooks/useConnector'
-import { X, Link2, Loader2, AlertCircle } from 'lucide-react'
+import { X, Link2, Loader2, AlertCircle, ExternalLink } from 'lucide-react'
 import { cn } from '@/utils/cn'
 
 type Source = 'feishu' | 'notion'
@@ -111,9 +111,78 @@ export default function ImportDialog({ open, onClose, onSuccess }: ImportDialogP
 
         {/* Error message */}
         {error && (
-          <div className="flex items-start gap-2 mb-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>{error}</span>
+          <div className="mb-4 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div>
+                  <div className="font-medium">{error.title}</div>
+                  <div className="mt-1 text-destructive/90">{error.message}</div>
+                </div>
+
+                {(error.code || error.requiredScopes?.length) && (
+                  <div className="space-y-1.5 rounded-md bg-background/70 p-2 text-xs text-foreground">
+                    {error.code && (
+                      <div className="flex gap-2">
+                        <span className="shrink-0 text-muted-foreground">错误码</span>
+                        <code className="font-mono">{error.code}</code>
+                      </div>
+                    )}
+                    {error.requiredScopes?.length ? (
+                      <div className="flex gap-2">
+                        <span className="shrink-0 text-muted-foreground">缺失权限</span>
+                        <div className="flex min-w-0 flex-wrap gap-1">
+                          {error.requiredScopes.map((scope) => (
+                            <code
+                              key={scope}
+                              className="rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] text-foreground"
+                            >
+                              {scope}
+                            </code>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                )}
+
+                {(error.actionUrl || error.troubleshootingUrl) && (
+                  <div className="flex flex-wrap gap-2">
+                    {error.actionUrl && (
+                      <a
+                        href={error.actionUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 rounded-md border border-destructive/30 bg-background px-2 py-1 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
+                      >
+                        开通权限
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                    {error.troubleshootingUrl && (
+                      <a
+                        href={error.troubleshootingUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 rounded-md border border-destructive/30 bg-background px-2 py-1 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
+                      >
+                        查看排查建议
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                {error.raw && error.raw !== error.message && (
+                  <details className="text-xs text-destructive/80">
+                    <summary className="cursor-pointer select-none">查看原始错误</summary>
+                    <pre className="mt-2 max-h-28 overflow-auto whitespace-pre-wrap break-words rounded bg-background/70 p-2 font-mono text-[11px] leading-relaxed text-foreground">
+                      {error.raw}
+                    </pre>
+                  </details>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
