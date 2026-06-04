@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { FeishuConnector, NotionConnector, type ResolvedDocument } from '@md2wechat/connectors'
 
-const API_BASE_URL = ''
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
 
 const feishuConnector = new FeishuConnector()
 const notionConnector = new NotionConnector()

@@ -22,10 +22,36 @@ async function readErrorMessage(response: Response): Promise<string> {
     if (json.error) return json.error;
     if (json.code) return `Request failed: ${json.code}`;
   } catch {
+    if (looksLikeHtml(text, response)) {
+      const htmlTitle = extractHtmlTitle(text);
+      const status = `HTTP ${response.status}${response.statusText ? ` ${response.statusText}` : ''}`;
+
+      if (response.status === 405) {
+        return `API 请求没有到达 md2wechat 后端服务（${status}${htmlTitle ? `，页面提示：${htmlTitle}` : ''}）。请确认 server 已启动，并检查 VITE_API_BASE_URL 或 Vite /api 代理配置。`;
+      }
+
+      return `API 服务返回了 HTML 页面（${status}${htmlTitle ? `，页面提示：${htmlTitle}` : ''}），请检查前端 API 地址是否指向 md2wechat server。`;
+    }
+
     return text;
   }
 
   return response.statusText || `HTTP ${response.status}`;
+}
+
+function looksLikeHtml(text: string, response: Response): boolean {
+  const contentType = response.headers.get('content-type') ?? '';
+  return contentType.includes('text/html') || /^\s*(?:<!doctype\s+html|<html)\b/i.test(text);
+}
+
+function extractHtmlTitle(text: string): string | undefined {
+  const title = text.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]
+    ?? text.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1];
+
+  return title
+    ?.replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 export class FeishuConnector implements DocumentConnector {

@@ -145,14 +145,31 @@ async function fetchFeishuApi<T>(url: URL, accessToken: string): Promise<T> {
 
 function normalizeMarkdown(markdown: string): string {
   let cleaned = convertHtmlTablesToMarkdown(markdown);
-  // Feishu exports HTML entities with a leading backslash: \&#34; → decode it first
-  cleaned = cleaned.replace(/\\&(#x?[0-9a-f]+|[a-z]+);/gi, '&$1;');
+  cleaned = normalizeEscapedHtmlEntities(cleaned);
   // Decode any remaining HTML entities (e.g. &#34; → ", &lt; → <)
   cleaned = decodeHtmlEntities(cleaned);
+  cleaned = unescapeFeishuMarkdownFormatting(cleaned);
+  cleaned = unescapeFeishuMarkdownPunctuation(cleaned);
   return cleaned
     .replace(/\r\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
+}
+
+function normalizeEscapedHtmlEntities(markdown: string): string {
+  return markdown
+    // Feishu can escape both entity parts: \&\#34; -> &#34;
+    .replace(/\\&\\(#x?[0-9a-f]+);/gi, '&$1;')
+    // Or only the ampersand: \&#34; / \&quot; -> &#34; / &quot;
+    .replace(/\\&(#x?[0-9a-f]+|[a-z]+);/gi, '&$1;');
+}
+
+function unescapeFeishuMarkdownFormatting(markdown: string): string {
+  return markdown.replace(/\\\*\\\*([^\n]+?)\\\*\\\*/g, '**$1**');
+}
+
+function unescapeFeishuMarkdownPunctuation(markdown: string): string {
+  return markdown.replace(/\\([()+\-])/g, '$1');
 }
 
 function convertHtmlTablesToMarkdown(markdown: string): string {

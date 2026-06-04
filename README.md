@@ -63,6 +63,14 @@ pnpm dev:server
 VITE_API_PROXY_TARGET=http://localhost:3000 pnpm dev:web
 ```
 
+如果前端不是通过 Vite 开发服务器访问（例如静态构建产物、预览服务或部署环境），需要显式指定后端 API 地址：
+
+```bash
+VITE_API_BASE_URL=http://localhost:3000 pnpm dev:web
+```
+
+看到 `405 Not Allowed` 的 HTML 页面时，通常表示 `/api/connectors/resolve` 没有打到 md2wechat server。请确认 `pnpm dev:server` 已启动，并检查 `VITE_API_BASE_URL` 或 `/api` 代理配置。
+
 ### 构建
 
 ```bash
