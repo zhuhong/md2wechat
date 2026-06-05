@@ -144,11 +144,13 @@ async function fetchFeishuApi<T>(url: URL, accessToken: string): Promise<T> {
 }
 
 function normalizeMarkdown(markdown: string): string {
-  let cleaned = convertHtmlTablesToMarkdown(markdown);
+  let cleaned = convertHtmlCalloutsToMarkdown(markdown);
+  cleaned = convertHtmlTablesToMarkdown(cleaned);
   cleaned = normalizeEscapedHtmlEntities(cleaned);
   // Decode any remaining HTML entities (e.g. &#34; → ", &lt; → <)
   cleaned = decodeHtmlEntities(cleaned);
   cleaned = unescapeFeishuMarkdownFormatting(cleaned);
+  cleaned = normalizeTightStrongLabels(cleaned);
   cleaned = unescapeFeishuMarkdownPunctuation(cleaned);
   return cleaned
     .replace(/\r\n/g, '\n')
@@ -168,8 +170,27 @@ function unescapeFeishuMarkdownFormatting(markdown: string): string {
   return markdown.replace(/\\\*\\\*([^\n]+?)\\\*\\\*/g, '**$1**');
 }
 
+function normalizeTightStrongLabels(markdown: string): string {
+  return markdown.replace(/(\*\*[^*\n]+?[：:]\*\*)(?=\S)/g, '$1&#8203;');
+}
+
 function unescapeFeishuMarkdownPunctuation(markdown: string): string {
-  return markdown.replace(/\\([()+\-])/g, '$1');
+  return markdown.replace(/\\([().~&+\-])/g, '$1');
+}
+
+function convertHtmlCalloutsToMarkdown(markdown: string): string {
+  return markdown.replace(
+    /<div\b[^>]*class=(["'])[^"']*\bcallout\b[^"']*\1[^>]*>([\s\S]*?)<\/div>/gi,
+    (_, _quote: string, content: string) => {
+      const normalizedContent = content
+        .replace(/^\s+|\s+$/g, '')
+        .replace(/\n{3,}/g, '\n\n');
+
+      if (!normalizedContent) return '';
+
+      return `\n\n:::info\n${normalizedContent}\n:::\n\n`;
+    }
+  );
 }
 
 function convertHtmlTablesToMarkdown(markdown: string): string {
