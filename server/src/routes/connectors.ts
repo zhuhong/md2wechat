@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import type { ApiResponse, ResolveRequest, ResolveResponse } from '../types/index.js';
 import { resolveFeishuDocument } from '../services/feishuService.js';
+import { resolveNotionDocument } from '../services/notionService.js';
+import { extractNotionPageId } from '@md2wechat/connectors';
 
 const connectors = new Hono();
 
@@ -43,13 +45,28 @@ connectors.post('/resolve', async (c) => {
       return c.json(response);
     }
   } else if (body.source === 'notion') {
-    mockResponse = {
-      source: 'notion',
-      title: 'Mock Notion Page',
-      markdown: `# Mock Notion Page\n\nSource: ${body.source}\nInput: ${body.input}\nToken provided: ${body.token ? 'yes' : 'no'}`,
-      assets: [],
-      warnings: ['当前为 mock 实现，尚未接入真实 Notion API。'],
-    };
+    const pageId = extractNotionPageId(body.input);
+    if (!pageId) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: '无效的 Notion 页面 URL 或 Page ID',
+        code: 'BAD_REQUEST',
+      };
+      c.status(400);
+      return c.json(response);
+    }
+    try {
+      mockResponse = await resolveNotionDocument(pageId, body.token);
+    } catch (err) {
+      console.error('[NotionConnector]', err);
+      const response: ApiResponse<never> = {
+        success: false,
+        error: err instanceof Error ? err.message : 'Notion document resolve failed',
+        code: 'NOTION_RESOLVE_ERROR',
+      };
+      c.status(502);
+      return c.json(response);
+    }
   } else {
     mockResponse = {
       source: 'local',

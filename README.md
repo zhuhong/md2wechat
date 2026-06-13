@@ -147,7 +147,35 @@ docs:document.content:read
 
 ### Notion 导入
 
-Notion 入口已保留，但当前仍是 mock 实现，尚未接入真实 Notion API。
+Notion 导入通过后端服务调用 Notion 公开 API，需要创建一个 Notion Integration 并将其接入目标页面。
+
+支持的 URL 形式：
+
+```text
+https://www.notion.so/Page-Title-abc123def456...
+https://notion.so/abc123def456...
+```
+
+配置环境变量：
+
+```bash
+NOTION_INTEGRATION_TOKEN=secret_xxx
+```
+
+**配置步骤：**
+
+1. 访问 https://www.notion.so/my-integrations 创建一个新的 Integration
+2. 复制 Internal Integration Token（以 `secret_` 开头）
+3. 在目标 Notion 页面右上角 → 「...」→「Connect to」→ 选择刚创建的 Integration
+4. 将 Token 填入 `.env` 或 `server/.env` 中
+
+导入失败时，前端会展示原始错误信息。常见错误：
+
+| 错误 | 原因 | 处理方式 |
+|------|------|----------|
+| `Missing NOTION_INTEGRATION_TOKEN` | 未配置 Integration Token | 按上方步骤配置 `.env` |
+| `401 Unauthorized` | Token 无效或已失效 | 检查 Token 是否正确 |
+| `404 Not Found` | 页面不存在或未接入 Integration | 在 Notion 页面中 Connect 对应 Integration |
 
 ## 🛠 技术栈
 

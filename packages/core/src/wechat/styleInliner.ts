@@ -17,37 +17,19 @@ export function inlineStyles(doc: Document, theme?: Theme): void {
   const elementsWithClass = doc.querySelectorAll('[class]');
   Array.from(elementsWithClass).forEach((el) => {
     const tag = el.tagName.toLowerCase();
+    // MathML and SVG elements — leave their attributes untouched
     if (
       [
-        'math',
-        'svg',
-        'mrow',
-        'mn',
-        'mo',
-        'mi',
-        'msup',
-        'msub',
-        'mfrac',
-        'annotation',
-        'semantics',
-        'mtext',
-        'mspace',
-        'mpadded',
-        'menclose',
-        'path',
-        'g',
-        'defs',
-        'use',
-        'rect',
-        'line',
+        'math', 'annotation', 'annotation-xml', 'semantics',
+        'mrow', 'mi', 'mn', 'mo', 'ms', 'mtext', 'mspace', 'mpadded',
+        'mfrac', 'msqrt', 'mroot', 'msub', 'msup', 'msubsup',
+        'munder', 'mover', 'munderover', 'mmultiscripts', 'mprescripts', 'none',
+        'mtable', 'mtr', 'mtd', 'mlabeledtr', 'merror', 'mphantom', 'mstyle',
+        'mfenced', 'menclose',
+        'svg', 'path', 'g', 'defs', 'use', 'rect', 'line',
         'mark',
       ].includes(tag)
     ) {
-      return;
-    }
-    // Preserve KaTeX classes so the preview stays correct.
-    // Note: WeChat editor may still strip these classes on paste.
-    if (el.closest('.katex') || el.classList.contains('katex')) {
       return;
     }
     // Preserve Shiki syntax-highlighting classes.

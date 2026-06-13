@@ -1,10 +1,12 @@
 import type { Diagnostic } from '../types.js';
 
 const ALLOWED_TAGS = new Set([
-  'a', 'abbr', 'annotation', 'b', 'blockquote', 'br', 'code', 'defs', 'div',
+  'a', 'abbr', 'annotation', 'annotation-xml', 'b', 'blockquote', 'br', 'code', 'defs', 'div',
   'em', 'g', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'i', 'img', 'li', 'line',
-  'mark', 'math', 'menclose', 'mfrac', 'mi', 'mn', 'mo', 'mpadded', 'mrow',
-  'mspace', 'msub', 'msup', 'mtext', 'nav', 'ol', 'p', 'path', 'pre', 'rect',
+  'mark', 'math', 'menclose', 'merror', 'mfenced', 'mfrac', 'mi', 'mlabeledtr', 'mmultiscripts',
+  'mn', 'mo', 'mover', 'mpadded', 'mphantom', 'mprescripts', 'mroot', 'mrow',
+  'ms', 'mspace', 'msqrt', 'mstyle', 'msub', 'msubsup', 'msup', 'mtable', 'mtd', 'mtext',
+  'mtr', 'munder', 'munderover', 'nav', 'none', 'ol', 'p', 'path', 'pre', 'rect',
   'semantics', 'span', 'strong', 'sub', 'sup', 'svg', 'table', 'tbody', 'td',
   'th', 'thead', 'tr', 'ul', 'use',
 ]);
@@ -12,6 +14,10 @@ const ALLOWED_TAGS = new Set([
 const ALLOWED_ATTRS = new Set([
   'href', 'src', 'alt', 'title', 'style', 'id', 'class',
   'data-original-src', 'data-diagram', 'data-diagram-type', 'lang', 'xmlns',
+  // MathML attributes
+  'display', 'encoding', 'mathvariant', 'mathsize', 'displaystyle', 'scriptlevel',
+  'lspace', 'rspace', 'stretchy', 'fence', 'separator', 'accent',
+  'rowalign', 'columnalign', 'columnspacing', 'rowspacing',
 ]);
 
 export function sanitizeForWechat(doc: Document): Diagnostic[] {

@@ -4,6 +4,7 @@ import katex from 'katex';
 function renderKatex(tex: string, displayMode: boolean): string {
   try {
     return katex.renderToString(tex, {
+      output: 'mathml',
       displayMode,
       throwOnError: false,
       strict: false,
